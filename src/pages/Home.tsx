@@ -7,37 +7,37 @@ import { useInView } from 'react-intersection-observer';
 
 const heroSlides = [
   {
-    image: 'public/NCC Hero Section 1.webp',
+    image: '/herosection_1.webp',
     title: 'Shaping Future Leaders',
     subtitle: 'Expert JNV & Sainik School Coaching',
     tag: '🏆 100+ Selections Every Year',
   },
   {
-    image: 'public/Sainic school jaipur.webp',
+    image: '/sainic_school_jaipur.webp',
     title: 'Excellence in Education',
     subtitle: 'From Class 1 to Competitive Success',
     tag: '⭐ Best Faculty in Rajasthan',
   },
   {
-    image: 'public/Football boys 2.webp',
+    image: '/football.webp',
     title: 'Holistic Development',
     subtitle: 'Academics + Sports + Good Manners',
     tag: '🎯 95% Success Rate',
   },
   {
-    image: 'public/lovekush photo.webp',
+    image: '/lovekush_photo.webp',
     title: 'Dream Big, Achieve More',
     subtitle: 'JNV & Military School Entrance Prep',
     tag: '🏫 Premium Hostel Facility',
   },
   {
-    image: 'public/Studying Kids.webp',
+    image: '/studyingkids.webp',
     title: 'Empowering Every Child',
     subtitle: 'Quality Education for Rural Students',
     tag: '🚌 Bus Transport Available',
   },
   {
-    image: 'public/Achivers.webp',
+    image: '/achivers.webp',
     title: 'Building Champions',
     subtitle: 'Physical Education + Mental Excellence',
     tag: '💪 Sports & Activities Daily',
@@ -342,22 +342,22 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <img
-                src="public/Boy with Books.webp"
+                src="/Boy with Books.webp"
                 alt="Students studying"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg"
               />
               <img
-                src="public/nirwan Academy building.webp"
+                src="/nirwan Academy building.webp"
                 alt="Children learning"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg mt-6"
               />
               <img
-                src="public/result1.webp"
+                src="/result1.webp"
                 alt="Kids in sports"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg -mt-6"
               />
               <img
-                src="public/students group.webp"
+                src="/students group.webp"
                 alt="Physical education"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg"
               />
@@ -525,7 +525,7 @@ export default function Home() {
               <div className="relative bg-gradient-to-b from-[#D97706] to-[#F59E0B] flex flex-col items-center justify-center p-8 text-center">
                 <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-2xl mb-4">
                   <img
-                    src="public/Ajay Pratap Director.webp"
+                    src="/Ajay Pratap Director.webp"
                     alt="Ajay Pratap Singh Nirwan- Director"
                     className="w-full h-full object-cover"
                   />
