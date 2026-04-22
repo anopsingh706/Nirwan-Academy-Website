@@ -23,7 +23,6 @@ const documents = [
   'Residence Proof',
 ];
 
-// ── Form State Type ───────────────────────────────────────────
 interface AdmissionFormState {
   student_name: string
   father_name: string
@@ -40,37 +39,92 @@ interface AdmissionFormState {
 }
 
 const INITIAL_FORM: AdmissionFormState = {
-  student_name:     '',
-  father_name:      '',
-  date_of_birth:    '',
-  gender:           '',
-  phone:            '',
-  email:            '',
-  class_applying:   '',
-  last_class_passed:'',
-  previous_school:  '',
-  address:          '',
-  mother_name:      '',
-  message:          '',
+  student_name:      '',
+  father_name:       '',
+  date_of_birth:     '',
+  gender:            '',
+  phone:             '',
+  email:             '',
+  class_applying:    '',
+  last_class_passed: '',
+  previous_school:   '',
+  address:           '',
+  mother_name:       '',
+  message:           '',
 };
 
 export default function Admissions() {
-  const [formData, setFormData] = useState<AdmissionFormState>(INITIAL_FORM);
-  const [submitted, setSubmitted] = useState(false);
-  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'error'>('idle');
-  const [formError, setFormError] = useState('');
+  const [formData, setFormData]               = useState<AdmissionFormState>(INITIAL_FORM);
+  const [submitted, setSubmitted]             = useState(false);
+  const [formStatus, setFormStatus]           = useState<'idle' | 'sending' | 'error'>('idle');
+  const [formError, setFormError]             = useState('');
 
-  // ── Handle Input Change ───────────────────────────────────
+  // ── NEW: validation error state ──────────────────────────────
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // ── NEW: checkbox state (separate from formData) ─────────────
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // ── Handle Input Change — also clears field error on typing ──
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear that field's error as soon as user starts fixing it
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
-  // ── Handle Submit → sends email via template_7f95jon ─────
+  // ── Handle Submit with full validation ───────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ── 1. Build errors object ──────────────────────────────────
+    const errors: Record<string, string> = {};
+
+    if (!formData.student_name.trim())
+      errors.student_name = 'Student name is required.';
+
+    if (!formData.father_name.trim())
+      errors.father_name = "Father's name is required.";
+
+    if (!formData.date_of_birth)
+      errors.date_of_birth = 'Date of birth is required.';
+
+    if (!formData.gender)
+      errors.gender = 'Please select gender.';
+
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required.';
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone.trim())) {
+      errors.phone = 'Enter a valid 10-digit phone number.';
+    }
+
+    if (!formData.class_applying)
+      errors.class_applying = 'Please select a course.';
+
+    if (!formData.last_class_passed)
+      errors.last_class_passed = 'Please select current class.';
+
+    if (!formData.address.trim())
+      errors.address = 'Home address is required.';
+
+    if (!agreedToTerms)
+      errors.agreedToTerms = 'You must agree to the terms before submitting.';
+
+    // ── 2. Stop if errors exist ─────────────────────────────────
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      // Scroll to first error smoothly
+      const firstErrorField = document.querySelector('.border-red-500');
+      firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // ── 3. All good — send email ────────────────────────────────
+    setValidationErrors({});
     setFormStatus('sending');
     setFormError('');
 
@@ -93,6 +147,7 @@ export default function Admissions() {
       setSubmitted(true);
       setFormStatus('idle');
       setFormData(INITIAL_FORM);
+      setAgreedToTerms(false);
     } else {
       setFormStatus('error');
       setFormError(result.message);
@@ -164,7 +219,7 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* ── Admission Process (CLEAN - NO FORMS INSIDE) ── */}
+      {/* ── Admission Process ── */}
       <section className="py-16 bg-gradient-to-br from-[#f8faff] to-[#eef2ff]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
@@ -180,7 +235,6 @@ export default function Admissions() {
                 key={i}
                 className="card-hover bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden"
               >
-                {/* Background step number */}
                 <div className="absolute top-0 right-0 text-7xl font-black text-gray-50 leading-none select-none">
                   {s.step}
                 </div>
@@ -195,8 +249,6 @@ export default function Admissions() {
               </div>
             ))}
           </div>
-
-          {/* Apply Now CTA below steps */}
           <div className="text-center mt-10">
             <a
               href="#apply"
@@ -272,7 +324,7 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* ── APPLICATION FORM (sends to template_7f95jon) ── */}
+      {/* ── APPLICATION FORM ── */}
       <section className="py-16 bg-white" id="apply">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-10">
@@ -315,7 +367,7 @@ export default function Admissions() {
               /* ── Form ── */
               <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
-                {/* Error Banner */}
+                {/* Error Banner — EmailJS failure */}
                 {formStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
                     <span className="text-red-500 text-xl">⚠️</span>
@@ -334,6 +386,8 @@ export default function Admissions() {
 
                 {/* Row 1: Student Name + Father Name */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Student Name */}
                   <div>
                     <label htmlFor="adm_student_name" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Student's Full Name <span className="text-red-500">*</span>
@@ -342,14 +396,23 @@ export default function Admissions() {
                       id="adm_student_name"
                       name="student_name"
                       type="text"
-                      required
                       value={formData.student_name}
                       onChange={handleChange}
                       placeholder="Enter student's full name"
                       autoComplete="name"
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.student_name ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     />
+                    {validationErrors.student_name && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.student_name}
+                      </p>
+                    )}
                   </div>
+
+                  {/* Father Name */}
                   <div>
                     <label htmlFor="adm_father_name" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Father's Name <span className="text-red-500">*</span>
@@ -358,17 +421,26 @@ export default function Admissions() {
                       id="adm_father_name"
                       name="father_name"
                       type="text"
-                      required
                       value={formData.father_name}
                       onChange={handleChange}
                       placeholder="Father's full name"
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.father_name ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     />
+                    {validationErrors.father_name && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.father_name}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Row 2: Mother Name + DOB */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Mother Name — Optional, no validation */}
                   <div>
                     <label htmlFor="adm_mother_name" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Mother's Name <span className="text-gray-400 text-xs">(Optional)</span>
@@ -383,6 +455,8 @@ export default function Admissions() {
                       className="form-input"
                     />
                   </div>
+
+                  {/* Date of Birth */}
                   <div>
                     <label htmlFor="adm_dob" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Date of Birth <span className="text-red-500">*</span>
@@ -391,17 +465,26 @@ export default function Admissions() {
                       id="adm_dob"
                       name="date_of_birth"
                       type="date"
-                      required
                       value={formData.date_of_birth}
                       onChange={handleChange}
                       max={new Date().toISOString().split('T')[0]}
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.date_of_birth ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     />
+                    {validationErrors.date_of_birth && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.date_of_birth}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Row 3: Gender + Phone */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Gender */}
                   <div>
                     <label htmlFor="adm_gender" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Gender <span className="text-red-500">*</span>
@@ -409,16 +492,25 @@ export default function Admissions() {
                     <select
                       id="adm_gender"
                       name="gender"
-                      required
                       value={formData.gender}
                       onChange={handleChange}
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.gender ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                     </select>
+                    {validationErrors.gender && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.gender}
+                      </p>
+                    )}
                   </div>
+
+                  {/* Phone */}
                   <div>
                     <label htmlFor="adm_phone" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Phone Number <span className="text-red-500">*</span>
@@ -427,17 +519,24 @@ export default function Admissions() {
                       id="adm_phone"
                       name="phone"
                       type="tel"
-                      required
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+91 XXXXX XXXXX"
                       autoComplete="tel"
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.phone ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     />
+                    {validationErrors.phone && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.phone}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Row 4: Email */}
+                {/* Row 4: Email — Optional */}
                 <div>
                   <label htmlFor="adm_email" className="text-sm font-medium text-gray-700 mb-1.5 block">
                     Email Address <span className="text-gray-400 text-xs">(Optional)</span>
@@ -454,8 +553,10 @@ export default function Admissions() {
                   />
                 </div>
 
-                {/* Row 5: Course Applying + Last Class Passed */}
+                {/* Row 5: Course + Current Class */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Course */}
                   <div>
                     <label htmlFor="adm_class_applying" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Course Applying For <span className="text-red-500">*</span>
@@ -463,10 +564,11 @@ export default function Admissions() {
                     <select
                       id="adm_class_applying"
                       name="class_applying"
-                      required
                       value={formData.class_applying}
                       onChange={handleChange}
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.class_applying ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     >
                       <option value="">Select Course</option>
                       <option value="JNV Class 6 Coaching">JNV Class 6 Coaching</option>
@@ -475,7 +577,15 @@ export default function Admissions() {
                       <option value="Military School Coaching">Military School Coaching</option>
                       <option value="Higher Primary (Class 1-8)">Higher Primary (Class 1-8)</option>
                     </select>
+                    {validationErrors.class_applying && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.class_applying}
+                      </p>
+                    )}
                   </div>
+
+                  {/* Current Class */}
                   <div>
                     <label htmlFor="adm_last_class" className="text-sm font-medium text-gray-700 mb-1.5 block">
                       Current Class <span className="text-red-500">*</span>
@@ -483,20 +593,27 @@ export default function Admissions() {
                     <select
                       id="adm_last_class"
                       name="last_class_passed"
-                      required
                       value={formData.last_class_passed}
                       onChange={handleChange}
-                      className="form-input"
+                      className={`form-input ${
+                        validationErrors.last_class_passed ? 'border-red-500 focus:ring-red-400' : ''
+                      }`}
                     >
                       <option value="">Select Class</option>
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(c => (
                         <option key={c} value={`Class ${c}`}>Class {c}</option>
                       ))}
                     </select>
+                    {validationErrors.last_class_passed && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.last_class_passed}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Row 6: Previous School */}
+                {/* Row 6: Previous School — Optional */}
                 <div>
                   <label htmlFor="adm_prev_school" className="text-sm font-medium text-gray-700 mb-1.5 block">
                     Previous School Name <span className="text-gray-400 text-xs">(Optional)</span>
@@ -521,15 +638,22 @@ export default function Admissions() {
                     id="adm_address"
                     name="address"
                     rows={2}
-                    required
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="Village/City, District, State"
-                    className="form-input resize-none"
+                    className={`form-input resize-none ${
+                      validationErrors.address ? 'border-red-500 focus:ring-red-400' : ''
+                    }`}
                   />
+                  {validationErrors.address && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {validationErrors.address}
+                    </p>
+                  )}
                 </div>
 
-                {/* Row 8: Message */}
+                {/* Row 8: Message — Optional */}
                 <div>
                   <label htmlFor="adm_message" className="text-sm font-medium text-gray-700 mb-1.5 block">
                     Additional Message <span className="text-gray-400 text-xs">(Optional)</span>
@@ -546,16 +670,31 @@ export default function Admissions() {
                 </div>
 
                 {/* Agree Checkbox */}
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    required
-                    id="adm_agree"
-                    className="rounded mt-0.5 w-4 h-4 accent-[#1E3A8A]"
-                  />
-                  <label htmlFor="adm_agree" className="text-sm text-gray-600 leading-relaxed">
-                    I agree to the terms and confirm that the information provided is accurate
-                  </label>
+                <div>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="adm_agree"
+                      checked={agreedToTerms}
+                      onChange={e => {
+                        setAgreedToTerms(e.target.checked);
+                        // Clear checkbox error as soon as they check it
+                        if (e.target.checked && validationErrors.agreedToTerms) {
+                          setValidationErrors(prev => ({ ...prev, agreedToTerms: '' }));
+                        }
+                      }}
+                      className="rounded mt-0.5 w-4 h-4 accent-[#1E3A8A]"
+                    />
+                    <label htmlFor="adm_agree" className="text-sm text-gray-600 leading-relaxed">
+                      I agree to the terms and confirm that the information provided is accurate
+                    </label>
+                  </div>
+                  {validationErrors.agreedToTerms && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1 ml-7">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {validationErrors.agreedToTerms}
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit Button */}

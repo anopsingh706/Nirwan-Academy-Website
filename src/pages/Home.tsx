@@ -108,6 +108,7 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'error'>('idle');
   const [formError, setFormError] = useState('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -128,28 +129,44 @@ export default function Home() {
   };
 
   // ✅ FIXED handleSubmit - sends real email
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormStatus('sending');
-    setFormError('');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const result = await sendHomeContactEmail({
-      full_name:         formData.name,
-      phone:             formData.phone,
-      email:             formData.email,
-      course_interested: formData.grade,
-      message:           formData.query,
-    });
+  const errors: Record<string, string> = {};
+  if (!formData.name.trim()) errors.name = 'Full name is required.';
+  if (!formData.phone.trim()) {
+    errors.phone = 'Phone number is required.';
+  } else if (!/^[6-9]\d{9}$/.test(formData.phone.trim())) {
+    errors.phone = 'Enter a valid 10-digit phone number.';
+  }
+  if (!formData.grade) errors.grade = 'Please select a course.';
 
-    if (result.success) {
-      setSubmitted(true);
-      setFormStatus('idle');
-      setFormData({ name: '', phone: '', email: '', grade: '', query: '' });
-    } else {
-      setFormStatus('error');
-      setFormError(result.message);
-    }
-  };
+  if (Object.keys(errors).length > 0) {
+    setValidationErrors(errors);
+    return;
+  }
+
+  setValidationErrors({});
+  setFormStatus('sending');
+  setFormError('');
+
+  const result = await sendHomeContactEmail({
+    full_name:         formData.name,
+    phone:             formData.phone,
+    email:             formData.email,
+    course_interested: formData.grade,
+    message:           formData.query,
+  });
+
+  if (result.success) {
+    setSubmitted(true);
+    setFormStatus('idle');
+    setFormData({ name: '', phone: '', email: '', grade: '', query: '' });
+  } else {
+    setFormStatus('error');
+    setFormError(result.message);
+  }
+};
 
   return (
     <div>
@@ -342,7 +359,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <img
-                src="/Boy with Books.webp"
+                src="/Gallery photos/scout.webp"
                 alt="Students studying"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg"
               />
@@ -352,7 +369,7 @@ export default function Home() {
                 className="rounded-2xl w-full h-52 object-cover shadow-lg mt-6"
               />
               <img
-                src="/result1.webp"
+                src="/Gallery photos/sainik.webp"
                 alt="Kids in sports"
                 className="rounded-2xl w-full h-52 object-cover shadow-lg -mt-6"
               />
@@ -569,6 +586,7 @@ export default function Home() {
       </section>
 
       {/* ===== ENQUIRY FORM ===== */}
+      {/* ===== ENQUIRY FORM ===== */}
       <section ref={formRef} className="py-20 bg-white" id="enquiry">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
@@ -661,6 +679,8 @@ export default function Home() {
 
                   {/* Row: Full Name + Phone */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    {/* Full Name */}
                     <div>
                       <label htmlFor="home_full_name" className="text-sm font-medium text-gray-700 mb-1.5 block">
                         Full Name <span className="text-red-500">*</span>
@@ -669,14 +689,29 @@ export default function Home() {
                         id="home_full_name"
                         name="home_full_name"
                         type="text"
-                        required
                         value={formData.name}
-                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        onChange={e => {
+                          setFormData({ ...formData, name: e.target.value });
+                          if (validationErrors.name)
+                            setValidationErrors(prev => ({ ...prev, name: '' }));
+                        }}
                         placeholder="Parent/Student Name"
                         autoComplete="name"
-                        className="form-input"
+                        className={`form-input ${
+                          validationErrors.name
+                            ? 'border-red-500 focus:ring-red-400'
+                            : ''
+                        }`}
                       />
+                      {validationErrors.name && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                          <i className="fas fa-exclamation-circle"></i>
+                          {validationErrors.name}
+                        </p>
+                      )}
                     </div>
+
+                    {/* Phone */}
                     <div>
                       <label htmlFor="home_phone" className="text-sm font-medium text-gray-700 mb-1.5 block">
                         Phone Number <span className="text-red-500">*</span>
@@ -685,20 +720,34 @@ export default function Home() {
                         id="home_phone"
                         name="home_phone"
                         type="tel"
-                        required
                         value={formData.phone}
-                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={e => {
+                          setFormData({ ...formData, phone: e.target.value });
+                          if (validationErrors.phone)
+                            setValidationErrors(prev => ({ ...prev, phone: '' }));
+                        }}
                         placeholder="+91 XXXXX XXXXX"
                         autoComplete="tel"
-                        className="form-input"
+                        className={`form-input ${
+                          validationErrors.phone
+                            ? 'border-red-500 focus:ring-red-400'
+                            : ''
+                        }`}
                       />
+                      {validationErrors.phone && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                          <i className="fas fa-exclamation-circle"></i>
+                          {validationErrors.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  {/* Email */}
+                  {/* Email - Optional, no validation needed */}
                   <div>
                     <label htmlFor="home_email" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                      Email Address <span className="text-gray-400 text-xs">(Optional)</span>
+                      Email Address{' '}
+                      <span className="text-gray-400 text-xs">(Optional)</span>
                     </label>
                     <input
                       id="home_email"
@@ -720,10 +769,17 @@ export default function Home() {
                     <select
                       id="home_course"
                       name="home_course"
-                      required
                       value={formData.grade}
-                      onChange={e => setFormData({ ...formData, grade: e.target.value })}
-                      className="form-input"
+                      onChange={e => {
+                        setFormData({ ...formData, grade: e.target.value });
+                        if (validationErrors.grade)
+                          setValidationErrors(prev => ({ ...prev, grade: '' }));
+                      }}
+                      className={`form-input ${
+                        validationErrors.grade
+                          ? 'border-red-500 focus:ring-red-400'
+                          : ''
+                      }`}
                     >
                       <option value="">Select Course</option>
                       <option>JNV Class 6 Coaching</option>
@@ -733,12 +789,19 @@ export default function Home() {
                       <option>Higher Primary (Class 1-8)</option>
                       <option>Hostel Admission</option>
                     </select>
+                    {validationErrors.grade && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {validationErrors.grade}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Message */}
+                  {/* Message - Optional, no validation needed */}
                   <div>
                     <label htmlFor="home_message" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                      Your Message <span className="text-gray-400 text-xs">(Optional)</span>
+                      Your Message{' '}
+                      <span className="text-gray-400 text-xs">(Optional)</span>
                     </label>
                     <textarea
                       id="home_message"
