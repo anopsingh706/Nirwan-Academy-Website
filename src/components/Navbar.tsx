@@ -57,7 +57,7 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-3'}`}>
+      <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-3' : 'bg-white/95 backdrop-blur-sm py-4'}`}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
 
           {/* ── Logo ── */}
@@ -65,11 +65,11 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="Nirwan Academy"
-              className="h-12 w-12 sm:h-14 sm:w-14 object-contain"
+              className="h-13 w-13 sm:h-14 sm:w-14 object-contain"
             />
             {/* Name + Tagline — always visible */}
             <div className="flex flex-col justify-center">
-              <h1 className="text-[18px] sm:text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight tracking-wide">
+              <h1 className="text-[13px] sm:text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight tracking-wide">
                 NIRWAN ACADEMY
               </h1>
               <p className="text-[10px] sm:text-[10px] text-[#D97706] font-semibold tracking-widest uppercase leading-tight mt-0.5">
