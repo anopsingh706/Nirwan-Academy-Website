@@ -59,22 +59,36 @@ export default function Navbar() {
       {/* Main Navbar */}
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-3'}`}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="Nirwan Academy" className="h-14 w-14 object-contain" />
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight">NIRWAN ACADEMY</h1>
-              <p className="text-[10px] text-[#D97706] font-semibold tracking-widest uppercase">Educating for Excellence • Since 2007</p>
+
+          {/* ── Logo ── */}
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
+            <img
+              src="/logo.png"
+              alt="Nirwan Academy"
+              className="h-10 w-10 sm:h-14 sm:w-14 object-contain"
+            />
+            {/* Name + Tagline — always visible */}
+            <div className="flex flex-col justify-center">
+              <h1 className="text-[13px] sm:text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight tracking-wide">
+                NIRWAN ACADEMY
+              </h1>
+              <p className="text-[8px] sm:text-[10px] text-[#D97706] font-semibold tracking-widest uppercase leading-tight mt-0.5">
+                <span className="hidden sm:inline">Educating for Excellence • </span>Since 2007
+              </p>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* ── Desktop Nav ── */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`nav-link px-3 py-2 rounded-lg text-sm font-medium transition-all ${location.pathname === link.path ? 'text-[#1E3A8A] bg-blue-50' : 'text-gray-700 hover:text-[#1E3A8A] hover:bg-blue-50'}`}
+                className={`nav-link px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  location.pathname === link.path
+                    ? 'text-[#1E3A8A] bg-blue-50'
+                    : 'text-gray-700 hover:text-[#1E3A8A] hover:bg-blue-50'
+                }`}
               >
                 {link.name}
                 {location.pathname === link.path && (
@@ -84,11 +98,19 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* CTA + Hamburger */}
-          <div className="flex items-center gap-3">
-            <Link to="/admissions" className="hidden md:flex btn-primary text-sm py-2.5 px-5">
-              <i className="fas fa-graduation-cap"></i> Apply Now
+          {/* ── CTA + Hamburger ── */}
+          <div className="flex items-center gap-2 sm:gap-3">
+
+            {/* Apply Now — smaller on mobile, normal on sm+ */}
+            <Link
+              to="/admissions"
+              className="btn-primary !flex !items-center !justify-center !gap-1 !text-[9px] !py-1.5 !px-2 sm:!text-sm sm:!py-2.5 sm:!px-5"
+            >
+              <i className="fas fa-graduation-cap !text-[9px] sm:!text-sm"></i>
+              <span>Apply Now</span>
             </Link>
+
+            {/* Hamburger — only on mobile/tablet */}
             <button
               onClick={() => setMobileOpen(true)}
               className="lg:hidden p-2 rounded-lg text-[#1E3A8A] hover:bg-blue-50 transition-colors"
@@ -99,13 +121,13 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Overlay */}
+      {/* ── Mobile Overlay ── */}
       <div
         className={`mobile-overlay ${mobileOpen ? 'open' : ''}`}
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Mobile Menu */}
+      {/* ── Mobile Menu ── */}
       <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`}>
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-[#1E3A8A]">
           <div className="flex items-center gap-3">
