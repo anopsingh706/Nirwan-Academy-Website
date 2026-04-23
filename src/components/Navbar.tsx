@@ -65,7 +65,7 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="Nirwan Academy"
-              className="h-13 w-13 sm:h-14 sm:w-14 object-contain"
+              className="h-14 w-14 sm:h-14 sm:w-14 object-contain"
             />
             {/* Name + Tagline — always visible */}
             <div className="flex flex-col justify-center">
@@ -104,7 +104,7 @@ export default function Navbar() {
             {/* Apply Now — smaller on mobile, normal on sm+ */}
             <Link
               to="/admissions"
-              className="btn-primary !flex !items-center !justify-center !gap-1 !text-[9px] !py-1.5 !px-2 sm:!text-sm sm:!py-2.5 sm:!px-5"
+              className="btn-primary !flex !items-center !justify-center !gap-1 !text-[13px] !py-1.5 !px-2 sm:!text-sm sm:!py-2.5 sm:!px-5"
             >
               <i className="fas fa-graduation-cap !text-[9px] sm:!text-sm"></i>
               <span>Apply Now</span>
