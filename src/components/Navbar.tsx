@@ -65,14 +65,14 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="Nirwan Academy"
-              className="h-10 w-10 sm:h-14 sm:w-14 object-contain"
+              className="h-12 w-12 sm:h-14 sm:w-14 object-contain"
             />
             {/* Name + Tagline — always visible */}
             <div className="flex flex-col justify-center">
-              <h1 className="text-[13px] sm:text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight tracking-wide">
+              <h1 className="text-[18px] sm:text-xl font-extrabold text-[#1E3A8A] font-['Playfair_Display'] leading-tight tracking-wide">
                 NIRWAN ACADEMY
               </h1>
-              <p className="text-[8px] sm:text-[10px] text-[#D97706] font-semibold tracking-widest uppercase leading-tight mt-0.5">
+              <p className="text-[10px] sm:text-[10px] text-[#D97706] font-semibold tracking-widest uppercase leading-tight mt-0.5">
                 <span className="hidden sm:inline">Educating for Excellence • </span>Since 2007
               </p>
             </div>
